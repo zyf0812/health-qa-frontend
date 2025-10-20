@@ -11,6 +11,6 @@
    // 注册所有图标
    for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
      app.component(key, component)
-   }
+   }  
    // 使用插件
    app.use(router).use(ElementPlus).mount('#app')
