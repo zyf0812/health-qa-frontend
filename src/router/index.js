@@ -1,16 +1,24 @@
- import { createRouter, createWebHistory } from 'vue-router'
-     import Home from '../views/Home.vue'
-     // 引入列表页（尚未创建，先配置）
-     import EntityList from '../views/EntityList.vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import AppLayout from '@/layout/MainLayout.vue'
+import Home from '@/views/Home.vue'
+import EntityList from '@/views/EntityList.vue'
+import EntityDetail from '@/views/EntityDetail.vue'
 
-     const routes = [
-       { path: '/', name: 'Home', component: Home },  // 首页（问答页）
-       { path: '/entity-list', name: 'EntityList', component: EntityList }  // 实体列表页
-     ]
+const routes = [
+  {
+    path: '/',
+    component: AppLayout,
+    children: [
+      { path: '', name: 'Home', component: Home },
+      { path: 'entity-list', name: 'EntityList', component: EntityList },
+      { path: 'entity-detail', name: 'EntityDetail', component: EntityDetail },
+    ],
+  },
+]
 
-     const router = createRouter({
-       history: createWebHistory(process.env.BASE_URL),
-       routes
-     })
+const router = createRouter({
+  history: createWebHistory('/'),
+  routes,
+})
 
-     export default router
+export default router

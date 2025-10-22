@@ -6,6 +6,8 @@
    import 'element-plus/dist/index.css'
    // 引入Element Plus图标
    import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+   // 引入全局样式
+   import './assets/global.css'
 
    const app = createApp(App)
    // 注册所有图标

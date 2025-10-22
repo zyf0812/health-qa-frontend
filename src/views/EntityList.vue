@@ -5,8 +5,8 @@
        <div class="filter-bar">
          <el-select 
            v-model="selectedType" 
-           placeholder="选择实体类型" 
-           @change="getEntityList"  -- 选择变化时重新查询
+           placeholder="选择实体类型"
+           @change="getEntityList" 
            class="select"
          >
            <el-option label="全部" value=""></el-option>
@@ -15,18 +15,18 @@
            <el-option label="食材" value="食材"></el-option>
          </el-select>
          <!-- 返回首页 -->
-         <el-link to="/" class="back-link">返回问答页</el-link>
+         <router-link to="/" class="back-link">返回问答页</router-link>
        </div>
        <!-- 实体表格 -->
        <el-table :data="entityList" :border="true" class="table" style="width: 100%;">
          <el-table-column prop="id" label="ID" width="80"></el-table-column>
          <el-table-column prop="name" label="实体名称" width="200"></el-table-column>
          <el-table-column prop="type" label="类型" width="120"></el-table-column>
-         <el-table-column prop="intro" label="简介">
+         <el-table-column prop="desc" label="简介" >
            <!-- 内容过长时省略 -->
            <template #default="scope">
-             <el-tooltip :content="scope.row.intro" placement="top">
-               <div class="intro-text">{{ scope.row.intro }}</div>
+             <el-tooltip :content="scope.row.desc" placement="top">
+               <div class="desc-text">{{ scope.row.desc }}</div>
              </el-tooltip>
            </template>
          </el-table-column>
@@ -82,5 +82,6 @@
    .list-container { width: 1200px; margin: 30px auto; }
    .filter-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
    .select { width: 200px; }
-   .intro-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 600px; }
+   .desc-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 600px; }
+   .back-link { color:green; text-decoration: none; }
    </style>

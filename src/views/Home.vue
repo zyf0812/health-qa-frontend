@@ -1,63 +1,163 @@
- <template>
-       <div class="home-container">
-         <h1>{{ title }}</h1>
+<template>
+  <div class="home-container">
+    <el-card class="home-card" shadow="hover">
+      <h1 class="title">{{ title }}</h1>
 
-          <el-link
-           to="/entity-list"
-           class="list-link"
-           >查看健康实体列表</el-link>
+      <el-link 
+        to="/entity-list" 
+        class="list-link"
+        @click="handleLinkJump"
+        type="primary"
+      >
+        查看健康实体列表
+      </el-link>
+       
+      <!-- 输入框 -->
+      <el-input 
+        v-model="question"
+        placeholder="请输入健康问题" 
+        class="input"
+        clearable
+      ></el-input>
+      
+      <!-- 查询按钮 -->
+      <el-button 
+        @click="queryAnswer" 
+        type="primary" 
+        class="btn" 
+        size="large"
+      >
+        查询答案
+      </el-button>
+      
+      <!-- 答案显示 -->
+      <transition name="fade">
+        <el-card v-if="answer" class="answer-card" shadow="never">
+          <p>{{ answer }}</p>
+        </el-card>
+      </transition>
+    </el-card>
+  </div>
+</template>
 
-         <!-- 输入框：双向绑定question变量 -->
-         <el-input 
-           v-model="question" 
-           placeholder="请输入健康问题" 
-           class="input"
-         ></el-input>
-         <!-- 按钮：点击触发queryAnswer方法 -->
-         <el-button @click="queryAnswer" type="primary" class="btn">查询答案</el-button>
-         <!-- 答案显示：条件渲染（有答案时显示） -->
-         <el-card v-if="answer" class="answer-card">
-           <p>{{ answer }}</p>
-         </el-card>
-       </div>
-     </template>
+<script setup>
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import request from '../utils/request'
+import { useRouter } from 'vue-router'
 
-     <script setup>
-     // Vue3组合式API：setup语法糖（简化代码）
-     import { ref } from 'vue'  // ref用于创建响应式变量
+const router = useRouter()
 
-     // 响应式变量（修改后页面自动更新）
-     const title = ref("健康养生知识问答")
-     const question = ref("")
-     const answer = ref("")
+const title = ref("健康养生知识问答")
+const question = ref("")
+const answer = ref("")
 
-     // 点击事件方法
-      import request from '../utils/request'  // 引入封装的Axios
+const handleLinkJump = () => {
+  router.push('/entity-list')
+}
 
-   const queryAnswer = async () => {  // async：异步方法
-     if (!question.value.trim()) {
-       ElMessage.warning("请输入你的健康问题！")
-       return
-     }
-     try {
-       // 发送POST请求，参数用URLSearchParams（表单格式）
-       const params = new URLSearchParams()
-       params.append('question', question.value)
-       // 调用后端接口，await：等待请求完成
-       const res = await request.post('/api/qa/query', params)
-       // 赋值给answer（响应拦截器已处理，res直接是data部分）
-       answer.value = res
-     } catch (error) {
-       // 捕获异常（如网络错误）
-       answer.value = ""
-     }
-   }
+const queryAnswer = async () => {
+  if (!question.value.trim()) {
+    ElMessage.warning("请输入你的健康问题！")
+    return
+  }
+  try {
+    const params = new URLSearchParams()
+    params.append('question', question.value)
+    const res = await request.post('/api/qa/query', params)
+    answer.value = res
+  } catch (error) {
+    answer.value = ""
+    ElMessage.error("查询失败，请重试")
+  }
+}
+</script>
 
-     </script>
+<style scoped>
+.home-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 120px);
+  background: linear-gradient(180deg, #f4f8fb 0%, #eef2f7 100%);
+  padding: 40px 0;
+  font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+}
 
-     <style scoped>
-     /* scoped：样式只作用于当前组件 */
-     .home-container { width: 800px; margin: 50px auto; }
-     .input { margin-bottom: 15px; }
-     .answer-card { margin-top: 20px; }
-     </style>
+/* 内容卡片 */
+.home-card {
+  width: 620px;
+  padding: 50px 40px;
+  text-align: center;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(64, 158, 255, 0.15);
+}
+
+/* 标题字体样式 */
+.title {
+  font-size: 30px;
+  font-weight: 700;
+  color: #1e3a8a;
+  letter-spacing: 1px;
+  margin-bottom: 30px;
+}
+
+/* el-link 样式 */
+.list-link {
+  display: inline-block;
+  margin-bottom: 25px;
+  font-size: 17px;
+  color: #3b82f6;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.25s;
+}
+.list-link:hover {
+  color: #1d4ed8;
+}
+
+/* 输入框样式 */
+.input {
+  margin: 25px 0;
+  width: 100%;
+  font-size: 16px;
+}
+
+/* 按钮样式 */
+.btn {
+  width: 100%;
+  margin-bottom: 25px;
+  font-size: 17px;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #409eff, #36a3f7);
+  border: none;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+  transition: all 0.3s ease;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
+}
+
+/* 答案卡片 */
+.answer-card {
+  margin-top: 25px;
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #334155;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+
+/* 动画效果 */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+</style>

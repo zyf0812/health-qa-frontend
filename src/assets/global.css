@@ -1,0 +1,113 @@
+/* ============================== */
+/* 🌐 全局基础样式（字体+布局） */
+/* ============================== */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+  overflow-x: hidden;
+}
+
+/* 全局容器通用宽度 */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 全局标题 */
+h1, h2, h3 {
+  color: #1e40af;
+  margin-bottom: 20px;
+}
+
+/* 按钮基础样式 */
+.el-button {
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+.el-button:hover {
+  transform: translateY(-1px);
+}
+
+/* 表格全局样式 */
+.el-table {
+  width: 100%;
+  font-size: 15px;
+}
+
+/* ============================== */
+/* 📱 响应式适配部分 */
+/* ============================== */
+
+/* 中屏（平板等 <= 992px） */
+@media (max-width: 992px) {
+  .container {
+    width: 95%;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  .el-button {
+    font-size: 15px;
+  }
+
+  .el-input {
+    font-size: 15px;
+  }
+}
+
+/* 小屏（手机等 <= 600px） */
+@media (max-width: 600px) {
+  html, body {
+    font-size: 15px;
+  }
+
+  .container {
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .el-card {
+    padding: 15px !important;
+  }
+
+  .el-input {
+    width: 100%;
+  }
+
+  .el-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto; /* ✅ 小屏时可横向滚动表格 */
+  }
+
+  .el-table__body {
+    min-width: 600px; /* 防止内容挤压 */
+  }
+
+  .el-button {
+    width: 100%;
+    font-size: 14px;
+  }
+}
+
+/* 超小屏（<= 400px） */
+@media (max-width: 400px) {
+  h1 {
+    font-size: 20px;
+  }
+
+  .el-card {
+    border-radius: 8px;
+  }
+}
