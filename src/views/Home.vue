@@ -65,7 +65,7 @@ const queryAnswer = async () => {
     const params = new URLSearchParams()
     params.append('question', question.value)
     const res = await request.post('/api/qa/query', params)
-    answer.value = res
+   answer.value = res.map((item, index) => `${index + 1}. ${item}`).join('\n');
   } catch (error) {
     answer.value = ""
     ElMessage.error("查询失败，请重试")
@@ -151,6 +151,11 @@ const queryAnswer = async () => {
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 18px 20px;
+   /* 让 \n 换行生效 */
+  white-space: pre-line;
+  /* 可选：增加行间距，优化可读性 */
+  line-height: 1.8;
+  padding: 10px;
 }
 
 /* 动画效果 */
