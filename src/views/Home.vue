@@ -2,16 +2,7 @@
   <div class="home-container">
     <el-card class="home-card" shadow="hover">
       <h1 class="title">{{ title }}</h1>
-
-      <el-link 
-        to="/entity-list" 
-        class="list-link"
-        @click="handleLinkJump"
-        type="primary"
-      >
-        查看健康实体列表
-      </el-link>
-       
+      
       <!-- 输入框 -->
       <el-input 
         v-model="question"
@@ -101,20 +92,6 @@ const queryAnswer = async () => {
   color: #1e3a8a;
   letter-spacing: 1px;
   margin-bottom: 30px;
-}
-
-/* el-link 样式 */
-.list-link {
-  display: inline-block;
-  margin-bottom: 25px;
-  font-size: 17px;
-  color: #3b82f6;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.25s;
-}
-.list-link:hover {
-  color: #1d4ed8;
 }
 
 /* 输入框样式 */

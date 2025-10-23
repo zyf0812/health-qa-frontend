@@ -7,7 +7,7 @@ html, body {
   height: 100%;
   font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
   background-color: #f8fafc;
-  color: #1e293b;
+  color: #1e3b2b;
   overflow-x: hidden;
 }
 
@@ -20,7 +20,7 @@ html, body {
 
 /* 全局标题 */
 h1, h2, h3 {
-  color: #1e40af;
+  color: #36bd90;
   margin-bottom: 20px;
 }
 

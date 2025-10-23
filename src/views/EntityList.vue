@@ -1,6 +1,6 @@
  <template>
      <div class="list-container">
-       <el-page-header content="健康实体列表"></el-page-header>
+     <div class="page-title">健康实体列表</div>
        <!-- 筛选条件：按类型筛选 -->
        <div class="filter-bar">
          <el-select 
@@ -14,8 +14,6 @@
            <el-option label="症状" value="症状"></el-option>
            <el-option label="食材" value="食材"></el-option>
          </el-select>
-         <!-- 返回首页 -->
-         <router-link to="/" class="back-link">返回问答页</router-link>
        </div>
        <!-- 实体表格 -->
        <el-table :data="entityList" :border="true" class="table" style="width: 100%;">
@@ -32,7 +30,7 @@
          </el-table-column>
          <el-table-column label="操作" width="120">
            <template #default="scope">
-             <!-- 查看详情按钮（后续开发详情页） -->
+             <!-- 查看详情按钮 -->
              <el-button 
                type="text" 
                @click="goToDetail(scope.row.id)"
@@ -59,18 +57,21 @@
      getEntityList()
    })
 
-   // 查询实体列表
-   const getEntityList = async () => {
-     try {
-       // 发送GET请求，参数type（可选）
-       const res = await request.get('/api/entity/list', {
-         params: { type: selectedType.value }
-       })
-       entityList.value = res
-     } catch (error) {
-       entityList.value = []
-     }
-   }
+      /**
+       * 查询实体列表
+       * @returns {Promise<void>} 无返回值
+       */
+      const getEntityList = async () => {
+        try {
+          // 发送GET请求获取实体列表数据
+          const res = await request.get('/api/entity/list', {
+            params: { type: selectedType.value }
+          })
+          entityList.value = res
+        } catch (error) {
+          entityList.value = []
+        }
+      }
 
    // 跳转到详情页（携带实体ID）
    const goToDetail = (id) => {
@@ -79,9 +80,9 @@
    </script>
 
    <style scoped>
+   .page-title { font-size: 25px; font-weight: bold; margin-bottom: 10px;padding-left: 25px; }
    .list-container { width: 1200px; margin: 30px auto; }
    .filter-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
    .select { width: 200px; }
    .desc-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 600px; }
-   .back-link { color:green; text-decoration: none; }
    </style>
