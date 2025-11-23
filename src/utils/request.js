@@ -4,7 +4,7 @@ import axios from 'axios'
      // 创建Axios实例
      const request = axios.create({
        baseURL: 'http://localhost:8080',  // 后端接口基础地址
-       timeout: 5000,  // 请求超时时间（5秒）
+       timeout: 30000,  // 请求超时时间（30秒）
        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }  // 表单提交格式
      })
 

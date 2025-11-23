@@ -3,7 +3,22 @@
     <el-card class="home-card" shadow="hover">
       <h1 class="title">{{ title }}</h1>
       
-      <!-- 输入框 -->
+      <!-- 新增：推荐问题区域（不影响原有布局） -->
+      <div class="recommend-questions">
+        <p class="recommend-title">推荐问题：</p>
+        <div class="recommend-list">
+          <el-tag 
+            v-for="(item, index) in recommendQuestions" 
+            :key="index"
+            @click="selectRecommendQuestion(item)"
+            class="recommend-tag"
+          >
+            {{ item }}
+          </el-tag>
+        </div>
+      </div>
+      
+      <!-- 原有输入框 -->
       <el-input 
         v-model="question"
         placeholder="请输入健康问题" 
@@ -11,7 +26,7 @@
         clearable
       ></el-input>
       
-      <!-- 查询按钮 -->
+      <!-- 原有查询按钮 -->
       <el-button 
         @click="queryAnswer" 
         type="primary" 
@@ -21,7 +36,7 @@
         查询答案
       </el-button>
       
-      <!-- 答案显示 -->
+      <!-- 原有答案显示 -->
       <transition name="fade">
         <el-card v-if="answer" class="answer-card" shadow="never">
           <p>{{ answer }}</p>
@@ -32,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue' 
 import { ElMessage } from 'element-plus'
 import request from '../utils/request'
 import { useRouter } from 'vue-router'
@@ -42,11 +57,43 @@ const router = useRouter()
 const title = ref("健康养生知识问答")
 const question = ref("")
 const answer = ref("")
+// 存储推荐问题（默认3个，避免请求失败时空白）
+const recommendQuestions = ref([
+  "熬夜后如何快速恢复精力？",
+  "春季养生适合吃哪些食物？",
+  "如何缓解颈椎疲劳？"
+])
 
 const handleLinkJump = () => {
   router.push('/entity-list')
 }
 
+// 页面加载时请求推荐问题
+onMounted(() => {
+  fetchRecommendQuestions()
+})
+
+// 请求后端推荐问题（使用原有 request 工具，路径保持 /api/qa/recommend）
+const fetchRecommendQuestions = async () => {
+  try {
+    const res = await request.get('/api/qa/recommend')
+    // 若后端返回有效数组，替换默认问题；否则保留默认
+    if (res && res.length > 0) {
+      recommendQuestions.value = res.slice(0, 3)
+    }
+  } catch (error) {
+    console.error("获取推荐问题失败（不影响使用）：", error)
+    // 失败后不修改推荐问题，继续显示默认标签
+  }
+}
+
+// 点击推荐问题填充到输入框并查询
+const selectRecommendQuestion = (q) => {
+  question.value = q
+  queryAnswer() 
+}
+
+// 查询答案
 const queryAnswer = async () => {
   if (!question.value.trim()) {
     ElMessage.warning("请输入你的健康问题！")
@@ -56,7 +103,7 @@ const queryAnswer = async () => {
     const params = new URLSearchParams()
     params.append('question', question.value)
     const res = await request.post('/api/qa/query', params)
-   answer.value = res.map((item, index) => `${index + 1}. ${item}`).join('\n');
+    answer.value = res.map((item, index) => `${index + 1}. ${item}`).join('\n');
   } catch (error) {
     answer.value = ""
     ElMessage.error("查询失败，请重试")
@@ -65,6 +112,7 @@ const queryAnswer = async () => {
 </script>
 
 <style scoped>
+
 .home-container {
   display: flex;
   justify-content: center;
@@ -75,7 +123,6 @@ const queryAnswer = async () => {
   font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
 }
 
-/* 内容卡片 */
 .home-card {
   width: 620px;
   padding: 50px 40px;
@@ -85,7 +132,6 @@ const queryAnswer = async () => {
   box-shadow: 0 8px 28px rgba(64, 158, 255, 0.15);
 }
 
-/* 标题字体样式 */
 .title {
   font-size: 30px;
   font-weight: 700;
@@ -94,14 +140,12 @@ const queryAnswer = async () => {
   margin-bottom: 30px;
 }
 
-/* 输入框样式 */
 .input {
   margin: 25px 0;
   width: 100%;
   font-size: 16px;
 }
 
-/* 按钮样式 */
 .btn {
   width: 100%;
   margin-bottom: 25px;
@@ -117,7 +161,6 @@ const queryAnswer = async () => {
   box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
 }
 
-/* 答案卡片 */
 .answer-card {
   margin-top: 25px;
   text-align: left;
@@ -128,18 +171,46 @@ const queryAnswer = async () => {
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 18px 20px;
-   /* 让 \n 换行生效 */
   white-space: pre-line;
-  /* 可选：增加行间距，优化可读性 */
   line-height: 1.8;
   padding: 10px;
 }
 
-/* 动画效果 */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s;
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+/* 推荐问题样式 */
+.recommend-questions {
+  margin-bottom: 25px;
+  text-align: left;
+}
+.recommend-title {
+  font-size: 15px;
+  color: #64748b;
+  margin-bottom: 12px;
+  font-weight: 500;
+  margin-top: 0;
+}
+.recommend-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.recommend-tag {
+  cursor: pointer;
+  background-color: #f0f9ff;
+  color: #165dff;
+  border-color: #e0efff;
+  padding: 6px 14px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.recommend-tag:hover {
+  background-color: #e0efff;
+  transform: translateY(-2px);
 }
 </style>

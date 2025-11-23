@@ -13,6 +13,9 @@
            <el-option label="疾病" value="疾病"></el-option>
            <el-option label="症状" value="症状"></el-option>
            <el-option label="食材" value="食材"></el-option>
+           <el-option label="食谱" value="食谱"></el-option>
+           <el-option label="治疗方法" value="治疗方法"></el-option>
+           <el-option label="禁忌" value="禁忌"></el-option>
          </el-select>
        </div>
        <!-- 实体表格 -->
