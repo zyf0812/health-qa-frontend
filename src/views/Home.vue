@@ -1,9 +1,10 @@
 <template>
   <div class="home-container">
     <el-card class="home-card" shadow="hover">
+      <!-- 标题 -->
       <h1 class="title">{{ title }}</h1>
       
-      <!-- 新增：推荐问题区域（不影响原有布局） -->
+      <!-- 推荐问题区域 -->
       <div class="recommend-questions">
         <p class="recommend-title">推荐问题：</p>
         <div class="recommend-list">
@@ -18,7 +19,7 @@
         </div>
       </div>
       
-      <!-- 原有输入框 -->
+      <!-- 输入框 -->
       <el-input 
         v-model="question"
         placeholder="请输入健康问题" 
@@ -26,7 +27,7 @@
         clearable
       ></el-input>
       
-      <!-- 原有查询按钮 -->
+      <!-- 查询按钮 -->
       <el-button 
         @click="queryAnswer" 
         type="primary" 
@@ -36,7 +37,7 @@
         查询答案
       </el-button>
       
-      <!-- 原有答案显示 -->
+      <!-- 答案显示 -->
       <transition name="fade">
         <el-card v-if="answer" class="answer-card" shadow="never">
           <p>{{ answer }}</p>
@@ -48,52 +49,46 @@
 
 <script setup>
 import { ref, onMounted } from 'vue' 
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElTag, ElInput, ElButton, ElCard, ElTransition } from 'element-plus'
 import request from '../utils/request'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
+// 页面核心变量
 const title = ref("健康养生知识问答")
 const question = ref("")
 const answer = ref("")
-// 存储推荐问题（默认3个，避免请求失败时空白）
 const recommendQuestions = ref([
   "熬夜后如何快速恢复精力？",
   "春季养生适合吃哪些食物？",
   "如何缓解颈椎疲劳？"
 ])
 
-const handleLinkJump = () => {
-  router.push('/entity-list')
-}
-
 // 页面加载时请求推荐问题
 onMounted(() => {
   fetchRecommendQuestions()
 })
 
-// 请求后端推荐问题（使用原有 request 工具，路径保持 /api/qa/recommend）
+// 请求后端推荐问题
 const fetchRecommendQuestions = async () => {
   try {
     const res = await request.get('/api/qa/recommend')
-    // 若后端返回有效数组，替换默认问题；否则保留默认
     if (res && res.length > 0) {
       recommendQuestions.value = res.slice(0, 3)
     }
   } catch (error) {
     console.error("获取推荐问题失败（不影响使用）：", error)
-    // 失败后不修改推荐问题，继续显示默认标签
   }
 }
 
-// 点击推荐问题填充到输入框并查询
+// 点击推荐问题填充并查询
 const selectRecommendQuestion = (q) => {
   question.value = q
   queryAnswer() 
 }
 
-// 查询答案
+// 查询答案核心逻辑
 const queryAnswer = async () => {
   if (!question.value.trim()) {
     ElMessage.warning("请输入你的健康问题！")
@@ -112,7 +107,7 @@ const queryAnswer = async () => {
 </script>
 
 <style scoped>
-
+/* 页面整体布局 */
 .home-container {
   display: flex;
   justify-content: center;
@@ -123,6 +118,7 @@ const queryAnswer = async () => {
   font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
 }
 
+/* 卡片容器 */
 .home-card {
   width: 620px;
   padding: 50px 40px;
@@ -132,6 +128,7 @@ const queryAnswer = async () => {
   box-shadow: 0 8px 28px rgba(64, 158, 255, 0.15);
 }
 
+/* 标题样式 */
 .title {
   font-size: 30px;
   font-weight: 700;
@@ -140,12 +137,14 @@ const queryAnswer = async () => {
   margin-bottom: 30px;
 }
 
+/* 输入框样式 */
 .input {
   margin: 25px 0;
   width: 100%;
   font-size: 16px;
 }
 
+/* 按钮样式 */
 .btn {
   width: 100%;
   margin-bottom: 25px;
@@ -161,6 +160,7 @@ const queryAnswer = async () => {
   box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
 }
 
+/* 答案卡片样式 */
 .answer-card {
   margin-top: 25px;
   text-align: left;
@@ -172,10 +172,9 @@ const queryAnswer = async () => {
   border-radius: 10px;
   padding: 18px 20px;
   white-space: pre-line;
-  line-height: 1.8;
-  padding: 10px;
 }
 
+/* 过渡动画 */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s;
 }

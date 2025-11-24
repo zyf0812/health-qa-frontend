@@ -2,8 +2,26 @@
   <el-container class="app-layout" direction="vertical">
     <!-- 顶部 Header -->
     <el-header class="app-header">
-      <div class="header-center">
+      <div class="header-left">
         <span class="title">健康知识图谱系统</span>
+      </div>
+      <!-- 右上角登录/注册独立选项 -->
+      <div class="header-right">
+        <el-link 
+          class="auth-link" 
+          type="text" 
+          @click="goToLogin"
+        >
+          登录
+        </el-link>
+        <span class="auth-split">|</span>
+        <el-link 
+          class="auth-link" 
+          type="text" 
+          @click="goToRegister"
+        >
+          注册
+        </el-link>
       </div>
     </el-header>
 
@@ -59,6 +77,7 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
 import { computed } from 'vue'
+import { ElLink } from 'element-plus' // 导入 ElLink 组件
 
 const router = useRouter()
 const route = useRoute()
@@ -66,6 +85,16 @@ const route = useRoute()
 const activeMenu = computed(() => {
   return route.path || '/'
 })
+
+// 跳转登录页
+const goToLogin = () => {
+  router.push('/login')
+}
+
+// 跳转注册页
+const goToRegister = () => {
+  router.push('/register')
+}
 </script>
 
 <style scoped>
@@ -78,19 +107,48 @@ const activeMenu = computed(() => {
 .app-header {
   height: 64px;
   background: linear-gradient(90deg, #1eaf3b, #54f63b);
-  padding: 0;
+  padding: 0 40px; /* 左右留白，避免贴边 */
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between; /* 标题居左，登录选项居右 */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 10;
 }
 
-.header-center .title {
+/* 标题左侧容器 */
+.header-left .title {
   font-size: 22px;
   font-weight: 600;
   color: #fff;
   letter-spacing: 1px;
+}
+
+/* 登录/注册右侧容器 */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* 选项间距 */
+}
+
+/* 登录/注册链接样式 */
+.auth-link {
+  font-size: 15px;
+  color: #fff; /* 白色文字，与头部背景协调 */
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.auth-link:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* hover 淡白色背景 */
+  color: #fff; /* 保持白色文字 */
+}
+
+/* 分隔符样式 */
+.auth-split {
+  color: rgba(255, 255, 255, 0.8); /* 淡白色分隔符 */
+  font-size: 14px;
 }
 
 /* 主内容容器 */

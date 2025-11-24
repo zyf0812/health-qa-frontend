@@ -8,7 +8,7 @@ import axios from 'axios'
        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }  // 表单提交格式
      })
 
-     // 请求拦截器（可选，如添加Token）
+     // 请求拦截器
      request.interceptors.request.use(
        config => {
          // 后续如需登录，可在此添加Token
