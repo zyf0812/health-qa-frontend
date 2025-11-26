@@ -3,7 +3,7 @@
     <!-- 顶部 Header -->
     <el-header class="app-header">
       <div class="header-left">
-        <span class="title">健康知识图谱系统</span>
+        <span class="title">健康知识系统</span>
       </div>
       <!-- 右上角登录/注册独立选项 -->
       <div class="header-right">

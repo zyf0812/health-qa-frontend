@@ -49,7 +49,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue' 
-import { ElMessage, ElTag, ElInput, ElButton, ElCard, ElTransition } from 'element-plus'
+import { ElMessage, ElTag, ElInput, ElButton, ElCard } from 'element-plus'
 import request from '../utils/request'
 import { useRouter } from 'vue-router'
 

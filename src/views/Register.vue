@@ -13,7 +13,7 @@
         <!-- 标题区域优化 -->
         <div class="register-header">
           <h2 class="register-title">健康养生知识问答平台</h2>
-          <p class="register-subtitle">创建您的账号，开启养生之旅</p>
+          <p class="register-subtitle">创建您的账号，开启健康养生之旅</p>
         </div>
         
         <el-form :model="registerForm" :rules="registerRules" ref="registerFormRef" label-width="80px" class="register-form">
@@ -108,7 +108,7 @@ const router = useRouter()
 const registerFormRef = ref(null)
 const isLoading = ref(false)
 
-// 注册表单数据（保持不变）
+// 注册表单数据
 const registerForm = reactive({
   userName: '',    // 用户名
   password: '',    // 密码
@@ -116,7 +116,7 @@ const registerForm = reactive({
   characterId: ''  // 身份证号
 })
 
-// 表单校验规则（保持不变）
+// 表单校验规则
 const registerRules = reactive({
   userName: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -143,24 +143,24 @@ const registerRules = reactive({
   ]
 })
 
-// 跳转到登录页（保持不变）
+// 跳转到登录页
 const goToLogin = () => router.push('/login')
 
-// 用户名输入处理（保持不变）
+// 用户名输入处理
 const handleUserNameInput = () => {
   if (registerForm.userName) {
     registerForm.userName = registerForm.userName.replace(/[^a-zA-Z0-9_-]/g, '')
   }
 }
 
-// 手机号输入处理（保持不变）
+// 手机号输入处理
 const handlePhoneInput = () => {
   if (registerForm.phone) {
     registerForm.phone = registerForm.phone.replace(/[^0-9]/g, '')
   }
 }
 
-// 身份证号输入处理（保持不变）
+// 身份证号输入处理
 const handleIdCardInput = () => {
   if (registerForm.characterId) {
     registerForm.characterId = registerForm.characterId
@@ -169,7 +169,7 @@ const handleIdCardInput = () => {
   }
 }
 
-// 密码强度文本判断（保持不变）
+// 密码强度文本判断
 const getPwdStrengthText = () => {
   const pwd = registerForm.password
   if (/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/.test(pwd)) {
@@ -193,7 +193,7 @@ const getPwdStrengthClass = () => {
   }
 }
 
-// 新增：密码强度图标（增强视觉反馈）
+// 密码强度图标
 const getPwdStrengthIcon = () => {
   const pwd = registerForm.password
   if (/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/.test(pwd)) {
@@ -205,7 +205,7 @@ const getPwdStrengthIcon = () => {
   }
 }
 
-// 处理注册逻辑（保持不变）
+// 处理注册逻辑
 const handleRegister = async () => {
   const valid = await registerFormRef.value.validate().catch(() => false)
   if (!valid) return
@@ -399,7 +399,7 @@ const handleRegister = async () => {
   margin-top: 10px;
 }
 
-/* 注册按钮 - 优化样式（与登录页统一） */
+/* 注册按钮 - 优化样式 */
 .register-btn {
   width: 70%;
   height: 54px;
@@ -446,5 +446,6 @@ const handleRegister = async () => {
 /* 适配Element Plus输入框聚焦样式 */
 ::v-deep .el-input__wrapper:focus-within {
   box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
-} 
+}
+ 
 </style>
