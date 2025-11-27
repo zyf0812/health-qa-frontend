@@ -70,28 +70,28 @@
             </el-button>
           </el-form-item>
           
-          <!-- 功能按钮组：移除返回首页 -->
+          <!-- 优化后的功能按钮组 -->
           <div class="func-btn-group">
             <el-button 
               type="text" 
-              class="findback-btn"
+              class="func-btn findback-btn"
               @click="goToFindback"
             >
-              <i class="el-icon-key"></i> 找回密码
+              <i class="el-icon-key"></i> 忘记密码
             </el-button>
             <el-button 
               type="text" 
-              class="update-info-btn"
+              class="func-btn update-info-btn"
               @click="goToUpdateInfo"
             >
-              <i class="el-icon-edit"></i> 修改信息
+              <i class="el-icon-edit"></i> 修改账号信息
             </el-button>
             <el-button 
               type="text" 
-              class="register-btn"
+              class="func-btn register-btn"
               @click="goToRegister"
             >
-              <i class="el-icon-user-plus"></i> 没有账号？去注册
+              <i class="el-icon-user-plus"></i> 注册新账号
             </el-button>
           </div>
         </el-form>
@@ -161,13 +161,10 @@ const handleLogin = async () => {
     params.append('code', loginForm.vcode.trim())
 
     const data = await request.get('/api/log/login', { params })
-    
-    // 关键：存储Token（优先使用后端返回的真实Token，无则存登录标识）
-    const token = data.token || `login_${Date.now()}` // 临时Token：用时间戳确保唯一性
+    const token = data.token || `login_${Date.now()}`
     localStorage.setItem('token', token)
     
     ElMessage.success('登录成功！')
-    // 跳转首页
     router.push('/')
   } catch (error) {
     ElMessage.error(error.message || '登录失败，请检查账号或验证码')
@@ -192,8 +189,6 @@ const goToUpdateInfo = () => {
 const goToFindback = () => {
   router.push('/findback-check')
 }
-
-// 移除返回首页函数
 </script>
 
 <style scoped>
@@ -207,7 +202,7 @@ const goToFindback = () => {
   font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
 }
 
-/* 背景装饰元素 - 增加层次感 */
+/* 背景装饰元素  */
 .bg-decoration {
   position: absolute;
   top: 0;
@@ -387,55 +382,70 @@ const goToFindback = () => {
   box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
 }
 
-/* 功能按钮组：适配3个按钮布局 */
+/* 优化后的功能按钮组 - 均匀分布+统一样式 */
 .func-btn-group {
   display: flex;
-  justify-content: flex-end;
-  gap: 20px;
-  margin-top: 20px;
-  padding: 0 4px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding: 0 10px;
 }
 
-/* 各功能按钮样式统一 */
-.findback-btn {
-  color: #409eff;
+/* 统一功能按钮样式 */
+.func-btn {
   font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  transition: color 0.2s ease;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+/* 忘记密码按钮 - 中性色 */
+.findback-btn {
+  color: #64748b;
 }
 
 .findback-btn:hover {
-  color: #165dff;
-  text-decoration: underline;
+  color: #409eff;
+  background-color: rgba(64, 158, 255, 0.08);
+  text-decoration: none;
 }
 
+/* 修改账号信息按钮 - 主色 */
 .update-info-btn {
   color: #409eff;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: color 0.2s ease;
 }
 
 .update-info-btn:hover {
   color: #165dff;
-  text-decoration: underline;
+  background-color: rgba(64, 158, 255, 0.08);
+  text-decoration: none;
 }
 
+/* 注册新账号按钮 - 强调色 */
 .register-btn {
-  color: #409eff;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: color 0.2s ease;
+  color: #165dff;
+  font-weight: 500;
 }
 
 .register-btn:hover {
-  color: #165dff;
-  text-decoration: underline;
+  color: #0f4cd0;
+  background-color: rgba(64, 158, 255, 0.1);
+  text-decoration: none;
+}
+
+/* 响应式适配 - 小屏幕自动换行 */
+@media (max-width: 480px) {
+  .func-btn-group {
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  
+  .func-btn {
+    font-size: 13px;
+  }
 }
 </style>

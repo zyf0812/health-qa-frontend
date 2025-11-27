@@ -1,3 +1,4 @@
+<!-- 404页面 -->
 <template>
   <div class="not-found-page">
     <h1>404</h1>
