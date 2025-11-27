@@ -29,7 +29,7 @@
             ></el-input>
           </el-form-item>
           
-          <!-- 密码输入框（带强度提示） -->
+          <!-- 密码输入框（优化强度提示样式） -->
           <el-form-item label="密码" prop="password">
             <el-input 
               v-model="registerForm.password" 
@@ -39,11 +39,49 @@
               prefix-icon="el-icon-lock"
               show-password
               class="custom-input"
+              @input="handlePasswordInput"
             ></el-input>
-            <!-- 密码强度提示（优化样式） -->
-            <div class="password-strength" v-if="registerForm.password.length >= 6">
-              <span :class="getPwdStrengthClass()">
-                <i :class="getPwdStrengthIcon()"></i> {{ getPwdStrengthText() }}
+            <!-- 优化：密码强度提示（与重置/修改页一致的进度条样式） -->
+            <div class="password-strength" v-if="registerForm.password.length > 0">
+              <div class="strength-bar">
+                <div 
+                  class="strength-progress" 
+                  :style="{ width: getStrengthProgressWidth(), background: getStrengthColor() }"
+                ></div>
+              </div>
+              <div class="strength-text">
+                <i :class="getStrengthIcon()"></i>
+                <span :class="getStrengthTextClass()">{{ getStrengthDesc() }}</span>
+              </div>
+            </div>
+          </el-form-item>
+
+          <!-- 确认密码（新增，与其他页面保持一致） -->
+          <el-form-item label="确认密码" prop="confirmPassword">
+            <el-input 
+              v-model="registerForm.confirmPassword" 
+              type="password" 
+              placeholder="请再次输入密码" 
+              clearable
+              prefix-icon="el-icon-lock"
+              show-password
+              class="custom-input"
+            ></el-input>
+            <!-- 新增：密码匹配提示 -->
+            <div class="password-match" v-if="registerForm.confirmPassword.length > 0">
+              <i 
+                :class="registerForm.password === registerForm.confirmPassword 
+                  ? 'el-icon-check text-green-500' 
+                  : 'el-icon-close text-red-500'"
+              ></i>
+              <span 
+                :class="registerForm.password === registerForm.confirmPassword 
+                  ? 'text-green-500' 
+                  : 'text-red-500'"
+              >
+                {{ registerForm.password === registerForm.confirmPassword 
+                  ? '密码匹配成功' 
+                  :'两次输入的密码不一致' }}
               </span>
             </div>
           </el-form-item>
@@ -100,7 +138,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import request from '@/utils/request'
 import { useRouter } from 'vue-router'
 
@@ -110,10 +148,11 @@ const isLoading = ref(false)
 
 // 注册表单数据
 const registerForm = reactive({
-  userName: '',    // 用户名
-  password: '',    // 密码
-  phone: '',       // 手机号
-  characterId: ''  // 身份证号
+  userName: '',        // 用户名
+  password: '',        // 密码
+  confirmPassword: '', // 确认密码
+  phone: '',           // 手机号
+  characterId: ''      // 身份证号
 })
 
 // 表单校验规则
@@ -126,7 +165,21 @@ const registerRules = reactive({
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, max: 20, message: '密码长度在 6-20 个字符之间', trigger: 'blur' },
-    { pattern: /^(?=.*[a-zA-Z])(?=.*\d).+$/, message: '密码需同时包含字母和数字', trigger: 'blur' }
+    { pattern: /^(?=.*[a-zA-Z])(?=.*\d).+$/, message: '密码需同时包含字母和数字', trigger: 'blur' },
+    { pattern: /^[^\\\s'"]+$/, message: '密码不能包含空格、单引号、双引号或反斜杠', trigger: 'blur' } // 新增：特殊字符限制
+  ],
+  confirmPassword: [ // 确认密码校验规则
+    { required: true, message: '请确认密码', trigger: 'blur' },
+    { 
+      validator: (rule, value, callback) => {
+        if (value !== registerForm.password) {
+          callback(new Error('两次输入的密码不一致'))
+        } else {
+          callback()
+        }
+      }, 
+      trigger: ['blur', 'input']
+    }
   ],
   phone: [
     { required: true, message: '请输入手机号', trigger: 'blur' },
@@ -169,46 +222,97 @@ const handleIdCardInput = () => {
   }
 }
 
-// 密码强度文本判断
-const getPwdStrengthText = () => {
+// 监听密码输入，触发响应式更新
+const handlePasswordInput = () => {}
+
+// 密码强度计算逻辑（与重置/修改页完全一致）
+const getPasswordStrength = () => {
   const pwd = registerForm.password
-  if (/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/.test(pwd)) {
-    return '强（含字母、数字、特殊符号，安全性高）'
-  } else if (/^(?=.*[a-zA-Z])(?=.*\d).+$/.test(pwd) && pwd.length >= 12) {
-    return '中（含字母+数字，长度充足）'
-  } else {
-    return '弱（仅含字母+数字，建议增加长度或特殊符号）'
+  if (pwd.length < 6) return 0
+  let strength = 1
+  // 包含字母+数字（基础强度）
+  if (/^(?=.*[a-zA-Z])(?=.*\d)/.test(pwd)) strength = 2
+  // 包含特殊符号（高强度）
+  if (/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z0-9])/.test(pwd)) strength = 3
+  // 长度≥12位（强化强度）
+  if (pwd.length >= 12) strength = Math.min(strength + 1, 3)
+  return strength
+}
+
+// 强度进度条宽度
+const getStrengthProgressWidth = () => {
+  const strength = getPasswordStrength()
+  return `${(strength / 3) * 100}%`
+}
+
+// 强度颜色
+const getStrengthColor = () => {
+  const strength = getPasswordStrength()
+  switch (strength) {
+    case 0: return '#e5e7eb'
+    case 1: return '#ef4444'
+    case 2: return '#f97316'
+    case 3: return '#10b981'
+    default: return '#e5e7eb'
   }
 }
 
-// 密码强度样式类（保持不变）
-const getPwdStrengthClass = () => {
-  const pwd = registerForm.password
-  if (/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/.test(pwd)) {
-    return 'text-green-500'
-  } else if (/^(?=.*[a-zA-Z])(?=.*\d).+$/.test(pwd) && pwd.length >= 12) {
-    return 'text-orange-500'
-  } else {
-    return 'text-red-500'
+// 强度图标
+const getStrengthIcon = () => {
+  const strength = getPasswordStrength()
+  switch (strength) {
+    case 0: return 'el-icon-warning text-gray-400'
+    case 1: return 'el-icon-warning text-red-500'
+    case 2: return 'el-icon-exclamation-circle text-orange-500'
+    case 3: return 'el-icon-check-circle text-green-500'
+    default: return 'el-icon-warning text-gray-400'
   }
 }
 
-// 密码强度图标
-const getPwdStrengthIcon = () => {
-  const pwd = registerForm.password
-  if (/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/.test(pwd)) {
-    return 'el-icon-check-circle'
-  } else if (/^(?=.*[a-zA-Z])(?=.*\d).+$/.test(pwd) && pwd.length >= 12) {
-    return 'el-icon-exclamation-circle'
-  } else {
-    return 'el-icon-warning'
+// 强度描述
+const getStrengthDesc = () => {
+  const strength = getPasswordStrength()
+  switch (strength) {
+    case 0: return '密码长度不足6位'
+    case 1: return '弱密码（建议增加长度或包含特殊符号）'
+    case 2: return '中强度密码（包含字母和数字）'
+    case 3: return '高强度密码（包含字母、数字和特殊符号）'
+    default: return '请输入密码'
   }
 }
 
-// 处理注册逻辑
+// 强度文本样式
+const getStrengthTextClass = () => {
+  const strength = getPasswordStrength()
+  switch (strength) {
+    case 0: return 'text-gray-400'
+    case 1: return 'text-red-500'
+    case 2: return 'text-orange-500'
+    case 3: return 'text-green-500'
+    default: return 'text-gray-400'
+  }
+}
+
+// 处理注册逻辑（优化错误提示和参数传递）
 const handleRegister = async () => {
   const valid = await registerFormRef.value.validate().catch(() => false)
   if (!valid) return
+
+  // 注册前二次确认
+  try {
+    await ElMessageBox.confirm(
+      '确认提交注册信息？注册后请使用账号密码登录',
+      '提示',
+      {
+        confirmButtonText: '确认注册',
+        cancelButtonText: '取消',
+        type: 'info'
+      }
+    )
+  } catch (e) {
+    ElMessage.info('已取消注册')
+    return
+  }
 
   isLoading.value = true
   try {
@@ -219,13 +323,8 @@ const handleRegister = async () => {
       characterId: registerForm.characterId.trim()
     }
 
-    const params = new URLSearchParams()
-    params.append('userName', submitForm.userName)
-    params.append('password', submitForm.password)
-    params.append('phone', submitForm.phone)
-    params.append('characterId', submitForm.characterId)
-
-    await request.get('/api/register/register', { params })
+    // 发送注册请求
+    await request.post('/api/register/register', submitForm)
 
     ElMessage.success('注册成功！即将跳转到登录页')
     registerFormRef.value.resetFields()
@@ -234,6 +333,7 @@ const handleRegister = async () => {
     }, 1500)
   } catch (error) {
     console.error('注册失败：', error)
+    ElMessage.error('注册失败：' + (error.message || '服务器异常，请稍后重试'))
   } finally {
     isLoading.value = false
   }
@@ -241,7 +341,7 @@ const handleRegister = async () => {
 </script>
 
 <style scoped>
-/* 页面根容器 - 与登录页一致的渐变背景 */
+/* 页面根容器 */
 .register-page {
   position: relative;
   width: 100vw;
@@ -251,7 +351,7 @@ const handleRegister = async () => {
   font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
 }
 
-/* 背景装饰元素 - 与登录页风格统一 */
+/* 背景装饰元素 */
 .bg-decoration {
   position: absolute;
   top: 0;
@@ -293,7 +393,7 @@ const handleRegister = async () => {
   animation-delay: 10s;
 }
 
-/* 浮动动画 - 与登录页一致 */
+/* 浮动动画  */
 @keyframes float {
   0% {
     transform: translate(0, 0) scale(1);
@@ -315,7 +415,7 @@ const handleRegister = async () => {
   padding: 20px;
 }
 
-/* 注册卡片 - 优化阴影和圆角（与登录页统一） */
+/* 注册卡片 - 优化阴影和圆角 */
 .register-card {
   width: 100%;
   max-width: 480px;
@@ -358,7 +458,7 @@ const handleRegister = async () => {
   margin-top: 10px;
 }
 
-/* 自定义输入框 - 与登录页一致的样式 */
+/* 自定义输入框 */
 .custom-input {
   height: 50px;
   font-size: 16px;
@@ -372,23 +472,41 @@ const handleRegister = async () => {
   box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
 }
 
-/* 密码强度提示 - 优化样式 */
+/* 密码强度样式 */
 .password-strength {
-  font-size: 13px;
-  margin-top: 6px;
-  height: 20px;
+  margin-top: 8px;
+}
+
+.strength-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #f3f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.strength-progress {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-text {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 13px;
 }
 
-.password-strength i {
-  font-size: 14px;
+/* 密码匹配提示样式 */
+.password-match {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
 }
-
-.text-green-500 { color: #10b981; }
-.text-orange-500 { color: #f97316; }
-.text-red-500 { color: #ef4444; }
 
 /* 按钮组 - 优化布局和样式 */
 .btn-group {
@@ -410,6 +528,10 @@ const handleRegister = async () => {
   border: none;
   box-shadow: 0 6px 16px rgba(64, 158, 255, 0.25);
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .register-btn:hover {
@@ -443,9 +565,63 @@ const handleRegister = async () => {
   margin-bottom: 22px;
 }
 
-/* 适配Element Plus输入框聚焦样式 */
-::v-deep .el-input__wrapper:focus-within {
-  box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
+/* 适配Element Plus加载图标 */
+:deep(.el-button--loading .el-icon-loading) {
+  margin-right: 8px;
 }
- 
+
+/* 颜色变量定义（统一样式） */
+.text-gray-400 { color: #9ca3af; }
+.text-red-500 { color: #ef4444; }
+.text-orange-500 { color: #f97316; }
+.text-green-500 { color: #10b981; }
+
+/* 响应式适配（与登录页保持一致） */
+@media (max-width: 576px) {
+  .register-card {
+    padding: 35px 25px;
+    border-radius: 20px;
+  }
+
+  .register-title {
+    font-size: 24px;
+  }
+
+  .custom-input {
+    height: 46px;
+    font-size: 15px;
+  }
+
+  .register-btn {
+    height: 50px;
+    font-size: 16px;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .go-login-btn {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 375px) {
+  .register-card {
+    padding: 30px 20px;
+  }
+
+  .el-form-item {
+    margin-bottom: 18px;
+  }
+
+  .strength-text {
+    font-size: 12px;
+  }
+
+  .password-match {
+    font-size: 12px;
+  }
+}
 </style>

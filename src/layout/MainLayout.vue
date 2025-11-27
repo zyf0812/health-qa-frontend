@@ -1,27 +1,19 @@
 <template>
   <el-container class="app-layout" direction="vertical">
-    <!-- 顶部 Header -->
+    <!-- 顶部 Header（添加退出登录按钮） -->
     <el-header class="app-header">
       <div class="header-left">
         <span class="title">健康知识系统</span>
       </div>
-      <!-- 右上角登录/注册独立选项 -->
+      <!-- 退出登录按钮 -->
       <div class="header-right">
-        <el-link 
-          class="auth-link" 
+        <el-button 
           type="text" 
-          @click="goToLogin"
+          class="logout-btn" 
+          @click="handleLogout"
         >
-          登录
-        </el-link>
-        <span class="auth-split">|</span>
-        <el-link 
-          class="auth-link" 
-          type="text" 
-          @click="goToRegister"
-        >
-          注册
-        </el-link>
+          <i class="el-icon-switch-button"></i> 退出登录
+        </el-button>
       </div>
     </el-header>
 
@@ -77,7 +69,7 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
 import { computed } from 'vue'
-import { ElLink } from 'element-plus' // 导入 ElLink 组件
+import { ElMessageBox, ElMessage } from 'element-plus' // 导入弹窗组件
 
 const router = useRouter()
 const route = useRoute()
@@ -86,14 +78,29 @@ const activeMenu = computed(() => {
   return route.path || '/'
 })
 
-// 跳转登录页
-const goToLogin = () => {
-  router.push('/login')
-}
-
-// 跳转注册页
-const goToRegister = () => {
-  router.push('/register')
+// 退出登录逻辑（带确认提示）
+const handleLogout = () => {
+  ElMessageBox.confirm(
+    '确定要退出登录吗？',
+    '退出确认',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(async () => {
+    // 清除登录状态
+    localStorage.removeItem('token') // 清除token
+    sessionStorage.clear() // 可选：清除所有会话存储
+    
+    ElMessage.success('退出登录成功！')
+    
+    // 跳转到登录页
+    router.push('/login')
+  }).catch(() => {
+    // 取消退出
+    ElMessage.info('已取消退出登录')
+  })
 }
 </script>
 
@@ -107,10 +114,10 @@ const goToRegister = () => {
 .app-header {
   height: 64px;
   background: linear-gradient(90deg, #1eaf3b, #54f63b);
-  padding: 0 40px; /* 左右留白，避免贴边 */
+  padding: 0 40px;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 标题居左，登录选项居右 */
+  justify-content: space-between; /* 标题居左，退出按钮居右 */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 10;
 }
@@ -123,32 +130,23 @@ const goToRegister = () => {
   letter-spacing: 1px;
 }
 
-/* 登录/注册右侧容器 */
+/* 退出登录按钮样式 */
 .header-right {
   display: flex;
   align-items: center;
-  gap: 16px; /* 选项间距 */
 }
 
-/* 登录/注册链接样式 */
-.auth-link {
+.logout-btn {
   font-size: 15px;
-  color: #fff; /* 白色文字，与头部背景协调 */
-  cursor: pointer;
-  padding: 4px 8px;
+  color: #fff;
+  padding: 6px 12px;
   border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
-.auth-link:hover {
-  background-color: rgba(255, 255, 255, 0.2); /* hover 淡白色背景 */
-  color: #fff; /* 保持白色文字 */
-}
-
-/* 分隔符样式 */
-.auth-split {
-  color: rgba(255, 255, 255, 0.8); /* 淡白色分隔符 */
-  font-size: 14px;
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
 
 /* 主内容容器 */
@@ -186,7 +184,7 @@ const goToRegister = () => {
 /* 菜单容器 */
 .side-menu {
   border-right: none;
-  height: calc(100% - 60px); /* 减去logo高度 */
+  height: calc(100% - 60px);
   padding-top: 10px;
 }
 
@@ -278,7 +276,7 @@ const goToRegister = () => {
   }
   
   .sidebar-logo {
-    display: none; /* 移动端隐藏logo */
+    display: none;
   }
   
   .side-menu {

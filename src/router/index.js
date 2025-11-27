@@ -4,32 +4,68 @@ import Home from '@/views/Home.vue'
 import EntityList from '@/views/EntityList.vue'
 import EntityDetail from '@/views/EntityDetail.vue'
 import AboutView from '@/views/AboutView.vue'
-// 导入登录和注册组件（确保文件路径正确）
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
+import CheckUserInfo from '@/views/CheckUserInfo.vue'
+import UpdateUserInfo from '@/views/UpdateUserInfo.vue'
+import FindBackCheck from '@/views/FindBackCheck.vue'
+import FindBackReset from '@/views/FindBackReset.vue'
 
 const routes = [
-  // 登录页（独立路由，不使用 AppLayout 布局）
   {
     path: '/login',
     name: 'Login',
     component: Login,
     meta: {
-      requiresAuth: false, // 不需要登录即可访问
-      title: '用户登录' // 页面标题
+      requiresAuth: false,
+      title: '用户登录'
     }
   },
-  // 注册页（独立路由，不使用 AppLayout 布局）
   {
     path: '/register',
     name: 'Register',
     component: Register,
     meta: {
-      requiresAuth: false, // 不需要登录即可访问
-      title: '用户注册' // 页面标题
+      requiresAuth: false,
+      title: '用户注册'
     }
   },
-  // 主布局路由（包含首页、实体列表等需要布局的页面）
+  {
+    path: '/check-user-info',
+    name: 'CheckUserInfo',
+    component: CheckUserInfo,
+    meta: {
+      requiresAuth: false,
+      title: '查询用户信息'
+    }
+  },
+  {
+    path: '/update-user-info',
+    name: 'UpdateUserInfo',
+    component: UpdateUserInfo,
+    meta: {
+      requiresAuth: false,
+      title: '用户信息'
+    }
+  },
+  {
+    path: '/findback-check',
+    name: 'FindBackCheck',
+    component: FindBackCheck,
+    meta: {
+      requiresAuth: false,
+      title: '找回密码-身份验证'
+    }
+  },
+  {
+    path: '/findback-reset',
+    name: 'FindBackReset',
+    component: FindBackReset,
+    meta: {
+      requiresAuth: false,
+      title: '找回密码-重置密码'
+    }
+  },
   {
     path: '/',
     component: AppLayout,
@@ -40,10 +76,9 @@ const routes = [
       { path: 'about', name: 'About', component: AboutView, meta: { title: '关于我们' } },
     ],
   },
-  // 添加404页面路由
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/' // 未匹配到的路由跳转到首页
+    redirect: '/login'
   }
 ]
 
@@ -52,11 +87,17 @@ const router = createRouter({
   routes,
 })
 
-// 动态设置页面标题
 router.beforeEach((to, from, next) => {
   if (to.meta.title) {
     document.title = to.meta.title
   }
+  
+  // 强制根路径跳转登录页（不改路径的核心逻辑）
+  if (to.path === '/' && !localStorage.getItem('token')) {
+    next('/login')
+    return
+  }
+  
   next()
 })
 

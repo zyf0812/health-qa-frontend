@@ -51,11 +51,8 @@
 import { ref, onMounted } from 'vue' 
 import { ElMessage, ElTag, ElInput, ElButton, ElCard } from 'element-plus'
 import request from '../utils/request'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
-
-// 页面核心变量
+// 页面核心变量（无任何登录/注册相关变量）
 const title = ref("健康养生知识问答")
 const question = ref("")
 const answer = ref("")

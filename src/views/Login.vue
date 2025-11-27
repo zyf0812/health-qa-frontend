@@ -58,11 +58,6 @@
             </div>
           </el-form-item>
           
-          <!-- 记住密码选项 -->
-          <el-form-item class="remember-me">
-            <el-checkbox v-model="rememberMe">记住密码</el-checkbox>
-          </el-form-item>
-          
           <el-form-item>
             <el-button 
               type="primary" 
@@ -75,14 +70,21 @@
             </el-button>
           </el-form-item>
           
-          <!-- 功能按钮组 -->
+          <!-- 功能按钮组：移除返回首页 -->
           <div class="func-btn-group">
             <el-button 
               type="text" 
-              class="home-btn"
-              @click="goToHome"
+              class="findback-btn"
+              @click="goToFindback"
             >
-              <i class="el-icon-house"></i> 返回首页
+              <i class="el-icon-key"></i> 找回密码
+            </el-button>
+            <el-button 
+              type="text" 
+              class="update-info-btn"
+              @click="goToUpdateInfo"
+            >
+              <i class="el-icon-edit"></i> 修改信息
             </el-button>
             <el-button 
               type="text" 
@@ -108,7 +110,6 @@ const router = useRouter()
 const loginFormRef = ref(null)
 const isLoading = ref(false)
 const currentVcode = ref('')
-const rememberMe = ref(false) 
 
 const loginForm = reactive({
   username: '',
@@ -127,18 +128,12 @@ const loginRules = reactive({
   ],
   vcode: [
     { required: true, message: '请输入验证码', trigger: 'blur' },
-    { min: 4, max: 6, message: '验证码长度为 6 个字符', trigger: 'blur' }
+    { min: 6, max: 6, message: '验证码长度为 6 个字符', trigger: 'blur' }
   ]
 })
 
 onMounted(() => {
   getVcode()
-  // 记住密码逻辑
-  const savedUser = localStorage.getItem('savedUser')
-  if (savedUser) {
-    loginForm.username = savedUser
-    rememberMe.value = true
-  }
 })
 
 const getVcode = async () => {
@@ -166,15 +161,13 @@ const handleLogin = async () => {
     params.append('code', loginForm.vcode.trim())
 
     const data = await request.get('/api/log/login', { params })
+    
+    // 关键：存储Token（优先使用后端返回的真实Token，无则存登录标识）
+    const token = data.token || `login_${Date.now()}` // 临时Token：用时间戳确保唯一性
+    localStorage.setItem('token', token)
+    
     ElMessage.success('登录成功！')
-    
-    // 记住密码逻辑
-    if (rememberMe.value) {
-      localStorage.setItem('savedUser', loginForm.username)
-    } else {
-      localStorage.removeItem('savedUser')
-    }
-    
+    // 跳转首页
     router.push('/')
   } catch (error) {
     ElMessage.error(error.message || '登录失败，请检查账号或验证码')
@@ -185,15 +178,22 @@ const handleLogin = async () => {
   }
 }
 
-// 返回首页
-const goToHome = () => {
-  router.push('/')
-}
-
 // 跳转注册页
 const goToRegister = () => {
   router.push('/register')
 }
+
+// 跳转信息修改验证页
+const goToUpdateInfo = () => {
+  router.push('/check-user-info')
+}
+
+// 跳转找回密码验证页
+const goToFindback = () => {
+  router.push('/findback-check')
+}
+
+// 移除返回首页函数
 </script>
 
 <style scoped>
@@ -203,7 +203,6 @@ const goToRegister = () => {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  /* 渐变背景优化：更柔和的蓝绿渐变，贴合养生主题 */
   background: linear-gradient(135deg, #e8f4f8 0%, #f0f8fb 50%, #f5fafe 100%);
   font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
 }
@@ -364,17 +363,6 @@ const goToRegister = () => {
   box-shadow: 0 4px 12px rgba(64, 158, 255, 0.15);
 }
 
-/* 记住密码选项 */
-.remember-me {
-  margin-bottom: 25px;
-  padding-left: 4px;
-}
-
-.remember-me .el-checkbox__label {
-  font-size: 14px;
-  color: #64748b;
-}
-
 /* 登录按钮 - 优化渐变和阴影 */
 .login-btn {
   width: 100%;
@@ -399,17 +387,18 @@ const goToRegister = () => {
   box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
 }
 
-/* 功能按钮组 - 优化布局 */
+/* 功能按钮组：适配3个按钮布局 */
 .func-btn-group {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
   margin-top: 20px;
   padding: 0 4px;
 }
 
-.home-btn {
-  color: #64748b;
+/* 各功能按钮样式统一 */
+.findback-btn {
+  color: #409eff;
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -417,8 +406,22 @@ const goToRegister = () => {
   transition: color 0.2s ease;
 }
 
-.home-btn:hover {
+.findback-btn:hover {
+  color: #165dff;
+  text-decoration: underline;
+}
+
+.update-info-btn {
   color: #409eff;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease;
+}
+
+.update-info-btn:hover {
+  color: #165dff;
   text-decoration: underline;
 }
 
@@ -434,53 +437,5 @@ const goToRegister = () => {
 .register-btn:hover {
   color: #165dff;
   text-decoration: underline;
-}
-
-/* 响应式适配 - 移动端优化 */
-@media (max-width: 576px) {
-  .login-card {
-    padding: 35px 25px;
-    border-radius: 20px;
-  }
-
-  .login-title {
-    font-size: 24px;
-  }
-
-  .custom-input {
-    height: 46px;
-    font-size: 15px;
-  }
-
-  .vcode-text {
-    width: 110px;
-    height: 46px;
-    font-size: 16px;
-  }
-
-  .login-btn {
-    height: 50px;
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 375px) {
-  .login-card {
-    padding: 30px 20px;
-  }
-
-  .vcode-container {
-    gap: 8px;
-  }
-
-  .vcode-text {
-    width: 100px;
-  }
-
-  .func-btn-group {
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
-  }
 }
 </style>

@@ -38,6 +38,6 @@ import axios from 'axios'
          ElMessage.error('网络错误：' + error.message)
          return Promise.reject(error)
        }
-     )
+     )  
 
      export default request
