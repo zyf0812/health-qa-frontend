@@ -11,61 +11,15 @@ import UpdateUserInfo from '@/views/UpdateUserInfo.vue'
 import FindBackCheck from '@/views/FindBackCheck.vue'
 import FindBackReset from '@/views/FindBackReset.vue'
 
+// 路由配置(定义路由规则)
 const routes = [
-  {
-    path: '/login',
-    name: 'Login',
-    component: Login,
-    meta: {
-      requiresAuth: false,
-      title: '用户登录'
-    }
-  },
-  {
-    path: '/register',
-    name: 'Register',
-    component: Register,
-    meta: {
-      requiresAuth: false,
-      title: '用户注册'
-    }
-  },
-  {
-    path: '/check-user-info',
-    name: 'CheckUserInfo',
-    component: CheckUserInfo,
-    meta: {
-      requiresAuth: false,
-      title: '查询用户信息'
-    }
-  },
-  {
-    path: '/update-user-info',
-    name: 'UpdateUserInfo',
-    component: UpdateUserInfo,
-    meta: {
-      requiresAuth: false,
-      title: '用户信息'
-    }
-  },
-  {
-    path: '/findback-check',
-    name: 'FindBackCheck',
-    component: FindBackCheck,
-    meta: {
-      requiresAuth: false,
-      title: '找回密码-身份验证'
-    }
-  },
-  {
-    path: '/findback-reset',
-    name: 'FindBackReset',
-    component: FindBackReset,
-    meta: {
-      requiresAuth: false,
-      title: '找回密码-重置密码'
-    }
-  },
+  {path: '/login',name: 'Login',component: Login,meta: { requiresAuth: false, title: '用户登录' }},
+  { path: '/register', name: 'Register', component: Register, meta: { requiresAuth: false, title: '用户注册' } },
+  { path: '/check-user-info', name: 'CheckUserInfo', component: CheckUserInfo, meta: { requiresAuth: false, title: '查询用户信息' } },
+  { path: '/update-user-info', name: 'UpdateUserInfo', component: UpdateUserInfo, meta: { requiresAuth: false, title: '用户信息' } },
+  { path: '/findback-check', name: 'FindBackCheck', component: FindBackCheck, meta: { requiresAuth: false, title: '找回密码-身份验证' } },
+  { path: '/findback-reset', name: 'FindBackReset', component: FindBackReset, meta: { requiresAuth: false, title: '找回密码-重置密码' } },
+  // 登录后页面组：使用 AppLayout
   {
     path: '/',
     component: AppLayout,
@@ -76,29 +30,17 @@ const routes = [
       { path: 'about', name: 'About', component: AboutView, meta: { title: '关于我们' } },
     ],
   },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/login'
-  }
+  { path: '/:pathMatch(.*)*', redirect: '/login' }
 ]
 
-const router = createRouter({
-  history: createWebHistory('/'),
-  routes,
-})
+// 创建路由实例
+const router = createRouter({ history: createWebHistory('/'), routes })
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.title) {
-    document.title = to.meta.title
-  }
-  
-  // 强制根路径跳转登录页（不改路径的核心逻辑）
-  if (to.path === '/' && !localStorage.getItem('token')) {
-    next('/login')
-    return
-  }
-  
-  next()
+// 全局路由守卫(检查登录状态)
+router.beforeEach((to, _, next) => {
+  if (to.meta.title) document.title = to.meta.title
+  if (to.path === '/' && !localStorage.getItem('token')) next('/login')
+  else next()
 })
 
 export default router
