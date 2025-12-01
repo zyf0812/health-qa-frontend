@@ -3,7 +3,7 @@ import axios from 'axios'
 
      // 创建Axios实例
      const request = axios.create({
-       baseURL: 'http://localhost:8080',  // 后端接口基础地址
+       baseURL: 'http://localhost:8999',  // 后端接口基础地址
        timeout: 30000,  // 请求超时时间（30秒）
        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }  // 表单提交格式
      })
@@ -30,7 +30,6 @@ import axios from 'axios'
          } 
          // 失败：显示提示
          else {
-           ElMessage.error(res.msg || '操作失败')
            return Promise.reject(new Error(res.msg || '操作失败'))
          }
        },

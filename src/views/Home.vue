@@ -33,6 +33,7 @@
         type="primary" 
         class="btn" 
         size="large"
+        :loading="isLoading"
       >
         查询答案
       </el-button>
@@ -52,10 +53,10 @@ import { ref, onMounted } from 'vue'
 import { ElMessage, ElTag, ElInput, ElButton, ElCard } from 'element-plus'
 import request from '../utils/request'
 
-// 页面核心变量（无任何登录/注册相关变量）
 const title = ref("健康养生知识问答")
 const question = ref("")
 const answer = ref("")
+const isLoading = ref(false)
 const recommendQuestions = ref([
   "熬夜后如何快速恢复精力？",
   "春季养生适合吃哪些食物？",
@@ -91,14 +92,20 @@ const queryAnswer = async () => {
     ElMessage.warning("请输入你的健康问题！")
     return
   }
+  
+  isLoading.value = true
+  answer.value = "" // 清空之前的答案
+  
   try {
     const params = new URLSearchParams()
     params.append('question', question.value)
     const res = await request.post('/api/qa/query', params)
     answer.value = res.map((item, index) => `${index + 1}. ${item}`).join('\n');
   } catch (error) {
-    answer.value = ""
-    ElMessage.error("查询失败，请重试")
+    // 捕获请求错误，显示友好提示
+    console.error('查询答案失败：', error)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>

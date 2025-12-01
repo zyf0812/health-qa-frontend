@@ -145,7 +145,7 @@ const handleCheck = async () => {
     
     if (data) {
       // 验证通过，跳转至信息修改页（携带用户名参数）
-      await ElMessageBox.success('身份验证成功，即将进入信息修改页')
+      ElMessage.success('身份验证成功，即将进入信息修改页')
       router.push({ 
         path: '/update-user-info', 
         query: { userName: checkForm.userName } 
