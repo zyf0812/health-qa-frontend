@@ -91,7 +91,7 @@ const handleLogout = () => {
   ).then(async () => {
     // 清除登录状态
     localStorage.removeItem('token') // 清除token
-    sessionStorage.clear() // 可选：清除所有会话存储
+    sessionStorage.clear() // 清除所有会话存储
     
     ElMessage.success('退出登录成功！')
     

@@ -275,7 +275,7 @@ const handleUpdate = async () => {
     }
 
     // 调用后端更新接口（PUT请求）
-    await request.put('/api/update', updateData)
+    await request.put('/update', updateData)
 
     ElMessage.success('信息修改成功！')
     // 跳转登录页重新登录
@@ -283,7 +283,6 @@ const handleUpdate = async () => {
       router.push('/login')
     }, 1500)
   } catch (error) {
-    console.error('修改信息异常：', error)
     ElMessage.error('修改失败：' + (error.message || '服务器异常'))
   } finally {
     isUpdating.value = false

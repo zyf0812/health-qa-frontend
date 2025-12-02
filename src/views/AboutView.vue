@@ -13,6 +13,14 @@
         <li>健康问题智能查询与解答</li>
       </ul>
       
+      <h3>系统数据统计</h3>
+      <div v-if="statsLoading" class="stats-loading">加载中...</div>
+      <div v-else class="stats-container">
+        <p>已收录健康实体总数：{{ stats?.totalEntities || 0 }}</p>
+        <p>涵盖疾病类型数：{{ stats?.diseaseCount || 0 }}</p>
+        <p>涵盖食材种类数：{{ stats?.foodCount || 0 }}</p>
+      </div>
+      
       <h3>联系方式</h3>
       <p>邮箱：217****317@qq.com</p>
       <p>电话：186****3351</p>
@@ -21,7 +29,29 @@
 </template>
 
 <script setup>
-// 可添加页面交互逻辑（如数据请求、事件处理等）
+import { ref, onMounted } from 'vue'
+import request from '@/utils/request' // 假设已封装axios请求工具
+
+const stats = ref(null)
+const statsLoading = ref(true)
+
+// 获取系统数据统计
+const getSystemStats = async () => {
+  try {
+    statsLoading.value = true
+    const res = await request.get('/api/system/stats')
+    stats.value = res
+  } catch (error) {
+    console.error('获取系统统计失败：', error)
+    stats.value = { totalEntities: '未知', diseaseCount: '未知', foodCount: '未知' }
+  } finally {
+    statsLoading.value = false
+  }
+}
+
+onMounted(() => {
+  getSystemStats()
+})
 </script>
 
 <style scoped>
@@ -56,5 +86,17 @@
 
 .about-content p {
   margin-bottom: 10px;
+}
+
+.stats-loading {
+  color: #666;
+  font-style: italic;
+}
+
+.stats-container {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
 }
 </style>

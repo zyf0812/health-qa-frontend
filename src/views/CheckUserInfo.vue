@@ -141,7 +141,7 @@ const handleCheck = async () => {
     params.append('characterId', checkForm.characterId.trim())
 
     // 调用后端检查接口
-    const data = await request.get('/api/update', { params })
+    const data = await request.get('/update', { params })
     
     if (data) {
       // 验证通过，跳转至信息修改页（携带用户名参数）

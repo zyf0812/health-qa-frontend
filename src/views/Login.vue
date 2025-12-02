@@ -139,7 +139,7 @@ onMounted(() => {
 const getVcode = async () => {
   currentVcode.value = '加载中...'
   try {
-    const data = await request.get('/api/log/vcode', {
+    const data = await request.get('/log/vcode', {
       params: { timestamp: new Date().getTime() }
     })
     currentVcode.value = data
@@ -160,10 +160,9 @@ const handleLogin = async () => {
     params.append('password', loginForm.password.trim())
     params.append('code', loginForm.vcode.trim())
 
-    const data = await request.get('/api/log/login', { params })
-    const token = data.token || `login_${Date.now()}`
-    localStorage.setItem('token', token)
-    
+    const data = await request.post('/log/login', params )
+    const token = data.token
+    localStorage.setItem('token', token)    
     ElMessage.success('登录成功！')
     router.push('/')
   } catch (error) {

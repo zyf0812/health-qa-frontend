@@ -324,7 +324,7 @@ const handleRegister = async () => {
     }
 
     // 发送注册请求
-    await request.post('/api/register/register', submitForm)
+    await request.post('/register/register', submitForm)
 
     ElMessage.success('注册成功！即将跳转到登录页')
     registerFormRef.value.resetFields()
@@ -332,7 +332,6 @@ const handleRegister = async () => {
       router.push('/login')
     }, 1500)
   } catch (error) {
-    console.error('注册失败：', error)
     ElMessage.error('注册失败：' + (error.message || '服务器异常，请稍后重试'))
   } finally {
     isLoading.value = false

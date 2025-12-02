@@ -134,7 +134,7 @@ const handleCheck = async () => {
     params.append('characterId', checkForm.characterId.trim())
 
     // 调用后端检查接口（
-    const data = await request.get('/api/find', { params })
+    const data = await request.get('/find', { params })
 
     // 适配后端返回格式：{"code":200,"msg":"操作成功","data":true}
     if (data === true) {
@@ -146,7 +146,6 @@ const handleCheck = async () => {
       })
     }
   } catch (error) {
-    console.error('验证异常：', error)
     ElMessage.error('验证失败：' + (error.message || '服务器异常'))
   } finally {
     isChecking.value = false
