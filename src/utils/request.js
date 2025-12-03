@@ -1,18 +1,18 @@
 import axios from 'axios'
-import { ElMessage } from 'element-plus'  
+import { ElMessage } from 'element-plus'
 import router from '@/router'  // 导入路由实例
 
 // 创建Axios实例
 const request = axios.create({
-  baseURL: 'http://localhost:8999',  
-  timeout: 30000,  
-  headers: { 'Content-Type': 'application/x-www-form-urlencoded' }  
+  baseURL: 'http://localhost:8999',
+  timeout: 30000,
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 })
 
 // 请求拦截器
 request.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('token') 
+    const token = localStorage.getItem('token')
     if (token) {
       config.headers.token = token
     }
@@ -36,9 +36,10 @@ request.interceptors.response.use(
   },
   error => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token') 
-      router.push('/login') 
-    } else {
+      localStorage.removeItem('token')
+      router.push('/login')
+    }
+    else {
       ElMessage.error('网络错误：' + error.message)
     }
     return Promise.reject(error)

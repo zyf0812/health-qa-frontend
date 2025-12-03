@@ -273,16 +273,14 @@ const handleReset = async () => {
     params.append('password', resetForm.newPassword)
 
     // 调用后端接口
-    const data = await request.put('/find', params)
+      await request.put('/find', params)
 
     // 适配后端返回格式：{"code":200,"msg":"操作成功","data":...}
-    if (data === true) {
       ElMessage.success('重置成功，请使用新密码登录')
       // 跳转登录页
        setTimeout(() => {
       router.push('/login')
     }, 1500)
-    }
   } catch (error) {
     ElMessage.error('重置失败：' + (error.message || '服务器异常'))
   } finally {

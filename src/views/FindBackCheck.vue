@@ -134,17 +134,15 @@ const handleCheck = async () => {
     params.append('characterId', checkForm.characterId.trim())
 
     // 调用后端检查接口（
-    const data = await request.get('/find', { params })
+      await request.get('/find', { params })
 
     // 适配后端返回格式：{"code":200,"msg":"操作成功","data":true}
-    if (data === true) {
       ElMessage.success('身份验证成功，即将进入密码重置页')
       // 携带用户名跳转至重置页
       router.push({ 
         path: '/findback-reset', 
         query: { userName: checkForm.userName } 
       })
-    }
   } catch (error) {
     ElMessage.error('验证失败：' + (error.message || '服务器异常'))
   } finally {

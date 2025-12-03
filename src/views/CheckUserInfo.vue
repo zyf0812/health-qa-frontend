@@ -141,16 +141,14 @@ const handleCheck = async () => {
     params.append('characterId', checkForm.characterId.trim())
 
     // 调用后端检查接口
-    const data = await request.get('/update', { params })
+      await request.get('/update', { params })
     
-    if (data) {
       // 验证通过，跳转至信息修改页（携带用户名参数）
       ElMessage.success('身份验证成功，即将进入信息修改页')
       router.push({ 
         path: '/update-user-info', 
         query: { userName: checkForm.userName } 
       })
-    } 
   } catch (error) {
     ElMessage.error('验证失败：' + (error.message || '服务器异常'))
   } finally {
