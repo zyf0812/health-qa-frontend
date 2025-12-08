@@ -12,11 +12,12 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.token = token
-    }
-    return config
+   const token = JSON.parse(localStorage.getItem('loginuser') || '{}')?.token;
+  // 有 token 才添加到请求头
+  if (token) {
+    config.headers.token = token;
+  }
+  return config
   },
   error => {
     ElMessage.error('请求发送失败：' + error.message)
@@ -36,7 +37,7 @@ request.interceptors.response.use(
   },
   error => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
+      localStorage.removeItem('loginuser')
       router.push('/login')
     }
     else {

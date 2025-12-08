@@ -160,9 +160,8 @@ const handleLogin = async () => {
     params.append('password', loginForm.password.trim())
     params.append('code', loginForm.vcode.trim())
 
-    const data = await request.post('/log/login', params )
-    const token = data.token
-    localStorage.setItem('token', token)    
+    const data = await request.post('/log/login', params);
+    localStorage.setItem('loginuser', JSON.stringify(data));  
     ElMessage.success('登录成功！')
     router.push('/')
   } catch (error) {
